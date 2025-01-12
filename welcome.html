@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome - Medical Prescription App</title>
+  <style>
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      margin: 20px;
+      background-color: #f9f9f9;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .welcome-message {
+      font-size: 1.1em;
+      color: green;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to the Medical Prescription App</h1>
+    <div id="welcomeMessage" class="welcome-message"></div>
+    <button id="proceedButton" onclick="proceedToMain()">Proceed to Drug Database</button>
+  </div>
+
+  <script>
+    // Check if the user is logged in by checking localStorage
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+
+    if (loggedInUser) {
+      // Display the welcome message with the user's name
+      const welcomeMessage = document.getElementById('welcomeMessage');
+      welcomeMessage.textContent = `Glad to see you again, ${loggedInUser.name}!`;
+    } else {
+      // If no user is logged in, redirect them back to the login page
+      window.location.href = "login.html";
+    }
+
+    function proceedToMain() {
+      window.location.href = "doctorinfo.html"; // Redirect to the Drug Database page
+    }
+  </script>
+</body>
+</html>

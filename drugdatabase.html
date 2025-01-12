@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug Database</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* General page styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        /* Group buttons vertically */
+        button {
+            display: block;
+            margin: 10px 0;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Adjust input field */
+        #drugInput {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Drug Database</h1>
+    
+    <input type="text" id="drugInput" list="drugList" placeholder="Enter drug name">
+    <datalist id="drugList"></datalist>
+
+    <!-- Buttons grouped vertically -->
+    <button onclick="addDrug()">Add Drug</button>
+    <button onclick="editDrug()">Edit Drug</button>
+    <button onclick="removeDrug()">Remove Drug</button>
+    <button onclick="generatePDF()">Generate PDF</button>
+    <button onclick="clearInput()">Clear Input</button>
+
+    <!-- Next button to go to the next page -->
+    <button onclick="goToNextPage()">Next</button>
+
+    <script>
+        let db;
+        const request = indexedDB.open('DrugDatabase', 1);
+
+        request.onupgradeneeded = function(event) {
+            db = event.target.result;
+            db.createObjectStore('drugs', { keyPath: 'name' });
+        };
+
+        request.onsuccess = function(event) {
+            db = event.target.result;
+            updateDatalist();
+        };
+
+        request.onerror = function(event) {
+            console.error('Database error:', event.target.errorCode);
+        };
+
+        // Add Drug to Database
+        function addDrug() {
+            const drugName = document.getElementById('drugInput').value.trim();
+            if (!drugName) {
+                alert('Please enter a drug name.');
+                return;
+            }
+
+            const transaction = db.transaction(['drugs'], 'readwrite');
+            const objectStore = transaction.objectStore('drugs');
+
+            const request = objectStore.get(drugName);
+
+            request.onsuccess = function() {
+                if (request.result) {
+                    alert('Drug already exists in the database.');
+                } else {
+                    objectStore.add({ name: drugName }).onsuccess = function() {
+                        alert('Drug added to database successfully!');
+                        updateDatalist();
+                        document.getElementById('drugInput').value = ''; // Clear input field after adding
+                    };
+                }
+            };
+        }
+
+        // Edit Drug in Database
+        function editDrug() {
+            const drugName = document.getElementById('drugInput').value.trim();
+            if (!drugName) {
+                alert('Please enter a drug name to edit.');
+                return;
+            }
+
+            const newDrugName = prompt('Edit the drug name:', drugName);
+            if (newDrugName && newDrugName !== drugName) {
+                const transaction = db.transaction(['drugs'], 'readwrite');
+                const objectStore = transaction.objectStore('drugs');
+
+                objectStore.delete(drugName).onsuccess = function() {
+                    objectStore.add({ name: newDrugName }).onsuccess = function() {
+                        alert('Drug updated successfully!');
+                        updateDatalist();
+                    };
+                };
+            }
+        }
+
+        // Remove Drug from Database
+        function removeDrug() {
+            const drugName = document.getElementById('drugInput').value.trim();
+            if (!drugName) {
+                alert('Please enter a drug name to remove.');
+                return;
+            }
+
+            const transaction = db.transaction(['drugs'], 'readwrite');
+            const objectStore = transaction.objectStore('drugs');
+
+            objectStore.delete(drugName).onsuccess = function() {
+                alert('Drug removed from database successfully!');
+                updateDatalist();
+            };
+        }
+
+        // Generate PDF using jsPDF
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const listContainer = document.getElementById('drugListContainer');
+
+            // Fetch all drugs from the database and prepare the list
+            const transaction = db.transaction(['drugs'], 'readonly');
+            const objectStore = transaction.objectStore('drugs');
+
+            let yOffset = 20;
+            let listCounter = 1;
+
+            objectStore.openCursor().onsuccess = function(event) {
+                const cursor = event.target.result;
+                if (cursor) {
+                    doc.text(`${listCounter}. ${cursor.value.name}`, 10, yOffset);
+                    yOffset += 10;
+                    listCounter++;
+                    cursor.continue();
+                } else {
+                    doc.save('drug_list.pdf');
+                }
+            };
+        }
+
+        // Clear Input Textbox
+        function clearInput() {
+            document.getElementById('drugInput').value = '';
+        }
+
+        // Update Datalist
+        function updateDatalist() {
+            const datalist = document.getElementById('drugList');
+            datalist.innerHTML = '';
+
+            const transaction = db.transaction(['drugs'], 'readonly');
+            const objectStore = transaction.objectStore('drugs');
+
+            objectStore.openCursor().onsuccess = function(event) {
+                const cursor = event.target.result;
+                if (cursor) {
+                    const option = document.createElement('option');
+                    option.value = cursor.value.name;
+                    datalist.appendChild(option);
+                    cursor.continue();
+                }
+            };
+        }
+
+        // Go to next page
+        function goToNextPage() {
+            const selectedDrugs = [];
+            const listItems = document.querySelectorAll('#drugListContainer li');
+
+            listItems.forEach(item => {
+                selectedDrugs.push(item.textContent.trim());
+            });
+
+            sessionStorage.setItem('selectedDrugs', JSON.stringify(selectedDrugs));
+            window.location.href = 'ptdrug.html';  // Change to the actual next page URL
+        }
+
+        window.onload = function() {
+            if (db) {
+                updateDatalist();
+            }
+        };
+    </script>
+</body>
+</html>

@@ -6,7 +6,6 @@
     <title>Drug Database</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* General page styling */
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -19,7 +18,6 @@
             width: 100%;
         }
 
-        /* Group buttons vertically */
         button {
             display: block;
             margin: 10px 0;
@@ -29,7 +27,6 @@
             padding: 10px;
             border-radius: 5px;
             font-size: 14px;
-            width: 100%;
             cursor: pointer;
         }
 
@@ -37,12 +34,10 @@
             background-color: #45a049;
         }
 
-        /* Adjust input field */
         #drugInput {
             width: 100%;
             padding: 10px;
             font-size: 14px;
-            margin: 10px 0;
         }
     </style>
 </head>
@@ -52,14 +47,11 @@
     <input type="text" id="drugInput" list="drugList" placeholder="Enter drug name">
     <datalist id="drugList"></datalist>
 
-    <!-- Buttons grouped vertically -->
     <button onclick="addDrug()">Add Drug</button>
     <button onclick="editDrug()">Edit Drug</button>
     <button onclick="removeDrug()">Remove Drug</button>
     <button onclick="generatePDF()">Generate PDF</button>
     <button onclick="clearInput()">Clear Input</button>
-
-    <!-- Next button to go to the next page -->
     <button onclick="goToNextPage()">Next</button>
 
     <script>
@@ -80,7 +72,6 @@
             console.error('Database error:', event.target.errorCode);
         };
 
-        // Add Drug to Database
         function addDrug() {
             const drugName = document.getElementById('drugInput').value.trim();
             if (!drugName) {
@@ -100,13 +91,12 @@
                     objectStore.add({ name: drugName }).onsuccess = function() {
                         alert('Drug added to database successfully!');
                         updateDatalist();
-                        document.getElementById('drugInput').value = ''; // Clear input field after adding
+                        document.getElementById('drugInput').value = '';
                     };
                 }
             };
         }
 
-        // Edit Drug in Database
         function editDrug() {
             const drugName = document.getElementById('drugInput').value.trim();
             if (!drugName) {
@@ -128,7 +118,6 @@
             }
         }
 
-        // Remove Drug from Database
         function removeDrug() {
             const drugName = document.getElementById('drugInput').value.trim();
             if (!drugName) {
@@ -145,38 +134,69 @@
             };
         }
 
-        // Generate PDF using jsPDF
         function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const listContainer = document.getElementById('drugListContainer');
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const pageHeight = doc.internal.pageSize.height;
+    const marginTop = 20;
+    const marginBottom = 10;
+    const lineHeight = 10;
+    let yOffset = marginTop;
+    let listCounter = 1;
+    const drugs = [];
 
-            // Fetch all drugs from the database and prepare the list
-            const transaction = db.transaction(['drugs'], 'readonly');
-            const objectStore = transaction.objectStore('drugs');
+    const transaction = db.transaction(['drugs'], 'readonly');
+    const objectStore = transaction.objectStore('drugs');
 
-            let yOffset = 20;
-            let listCounter = 1;
+    objectStore.openCursor().onsuccess = function(event) {
+        const cursor = event.target.result;
+        if (cursor) {
+            drugs.push(cursor.value.name);
+            cursor.continue();
+        } else {
+            // Sort the drugs
+            drugs.sort((a, b) => {
+                // Check if both values are numbers
+                const aIsNumber = !isNaN(a);
+                const bIsNumber = !isNaN(b);
 
-            objectStore.openCursor().onsuccess = function(event) {
-                const cursor = event.target.result;
-                if (cursor) {
-                    doc.text(`${listCounter}. ${cursor.value.name}`, 10, yOffset);
-                    yOffset += 10;
-                    listCounter++;
-                    cursor.continue();
+                if (aIsNumber && bIsNumber) {
+                    // If both are numbers, sort numerically
+                    return parseFloat(a) - parseFloat(b);
+                } else if (aIsNumber) {
+                    // If only a is a number, a should come first
+                    return -1;
+                } else if (bIsNumber) {
+                    // If only b is a number, b should come first
+                    return 1;
                 } else {
-                    doc.save('drug_list.pdf');
+                    // If both are strings, sort alphabetically
+                    return a.localeCompare(b);
                 }
-            };
-        }
+            });
 
-        // Clear Input Textbox
+            // Add drugs to the PDF
+            drugs.forEach((drug) => {
+                if (yOffset + lineHeight > pageHeight - marginBottom) {
+                    doc.addPage();
+                    yOffset = marginTop;
+                }
+
+                doc.text(`${listCounter}. ${drug}`, 10, yOffset);
+                yOffset += lineHeight;
+                listCounter++;
+            });
+
+            // Save the PDF
+            doc.save('drug_list.pdf');
+        }
+    };
+}
+
         function clearInput() {
             document.getElementById('drugInput').value = '';
         }
 
-        // Update Datalist
         function updateDatalist() {
             const datalist = document.getElementById('drugList');
             datalist.innerHTML = '';
@@ -195,7 +215,6 @@
             };
         }
 
-        // Go to next page
         function goToNextPage() {
             const selectedDrugs = [];
             const listItems = document.querySelectorAll('#drugListContainer li');
@@ -205,7 +224,7 @@
             });
 
             sessionStorage.setItem('selectedDrugs', JSON.stringify(selectedDrugs));
-            window.location.href = 'ptdrug.html';  // Change to the actual next page URL
+            window.location.href = 'ptdrug.html';
         }
 
         window.onload = function() {

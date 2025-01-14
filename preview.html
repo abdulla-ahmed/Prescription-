@@ -148,6 +148,7 @@
           <td>
             <p><strong>Drug Name:</strong> ${drug.name || ''}</p>
             <p><strong>Dose:</strong> ${drug.dose || ''}</p>
+            <p><strong>Duration:</strong> ${drug.duration || ''}</p>
             <p><strong>Amount:</strong> ${drug.amount || ''}</p>
             <p><strong>Frequency:</strong> ${drug.frequency || ''}</p>
             <p><strong>Meal:</strong> ${drug.meal || ''}</p>
@@ -180,12 +181,12 @@
   const formattedDate = new Date().toLocaleDateString();
 
   const drugList = drugs.map(drug => {
-    const { name, dose, amount, duration, frequency, notes } = drug;
+    const { name, dose, duration, amount, frequency, meal, notes } = drug;
     return `
       <li style="margin-bottom: 5px; list-style-position: inside; text-align: left;">
         <span><strong>Drug:</strong> ${name || ''}, <strong>Dose:</strong> ${dose || ''}, <strong>Duration:</strong> ${duration || ''}, <strong>Amount:</strong> ${amount || ''}</span>
         <br>
-        <span><strong>Frequency:</strong> ${frequency || ''}, <strong>Notes:</strong> ${notes || ''}</span>
+        <span><strong>Frequency:</strong> ${frequency || ''}, <strong>Meal:</strong> ${meal || ''}, <strong>Notes:</strong> ${notes || ''}</span>
       </li>
     `;
   }).join('');

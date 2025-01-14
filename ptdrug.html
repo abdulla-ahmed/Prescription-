@@ -141,9 +141,10 @@
         drugEntry.innerHTML = `
           <div class="form-group">
             <label for="drug-name">Drug Name:</label>
-            <select name="drug-name">
-              ${drugDatabase.map(drug => `<option value="${drug}">${drug}</option>`).join('')}
-            </select>
+            <input list="drug-list" name="drug-name" placeholder="Type drug name" />
+            <datalist id="drug-list">
+              ${drugDatabase.map(drug => `<option value="${drug}">`).join('')}
+            </datalist>
           </div>
           <div class="form-group">
             <label for="dose">Dose:</label>
@@ -201,7 +202,7 @@
 
       entries.forEach(entry => {
         const drug = {
-          name: entry.querySelector('select[name="drug-name"]').value,
+          name: entry.querySelector('input[name="drug-name"]').value,
           dose: entry.querySelector('input[name="dose"]').value,
           amount: entry.querySelector('input[name="amount"]').value,
           frequency: entry.querySelector('select[name="frequency"]').value,

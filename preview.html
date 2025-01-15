@@ -191,49 +191,79 @@
     `;
   }).join('');
 
-  const content = `
-    <div style="font-family: 'Times New Roman', Times, serif; width: 100%; text-align: center;">
-      <h2 style="color: darkblue; line-height: 0.5; font-size: 45px;">${doctorName || ''}</h2>
-      <p style="color: darkblue; line-height: 0.5; font-size: 20px;">${doctorSpecialty || ''}</p>
-      <p style="color: darkblue; line-height: 1.2; font-size: 15px;">${doctorWork || ''}</p>
-      <p style="color: darkblue; line-height: 0.5; font-size: 15px;">رقم التسجيل ${doctorRegNo || ''}</p>
-      <hr>
-      <div style="text-align: left;">
-        <p style="display: inline-block; width: 40%; padding-right: 10px;">Patient Name: ${patientName}</p>
-        <p style="display: inline-block; width: 27%; padding-right: 10px;">Age: ${patientAge}</p>
-        <p style="display: inline-block; width: 27%;">Sex: ${patientGender}</p>
-      </div>
-      <hr>
-      <p style="text-align: left; color: red;">Prescription:</p>
-      <ol style="color: black; padding-left: 20px; margin: 5px; line-height: 1.2;">
-        ${drugList}
-      </ol>
-      <div style="position: relative; text-align: right; margin-top: 20px;">
-        <p style="margin: 0; position: relative; z-index: 1;">Doctor's Signature</p>
-        <p id="dateDisplay" style="margin: 0; position: relative; z-index: 3; transform: translateX(-30px);">${formattedDate}</p>
-        <img src="${doctorSignatureSrc || ''}" alt="Doctor's Signature" style="position: absolute; top: -70px; right: 0; width: 150px; height: 100px; object-fit: contain; opacity: 0.8; z-index: 2;">
-      </div>
-      <hr>
-      <div ">
-        <p style="text-align: center; width: 100%; line-height: 0; color: green;">العنوان ${doctorAddress || ''}</p>
-        <p style="display: inline-block; text-align: left; width: 60%; line-height: 0; color: green;">Email: ${doctorEmail || ''}</p>
-        <p style="display: inline-block; text-align: right; width: 25%; line-height: 0; color: green; margin-left: 30px;">الهاتف ${doctorMobile || ''}</p>
-      </div>
-    </div>
-  `;
+  const imageUrl = "https://raw.githubusercontent.com/abdulla-ahmed/pic/refs/heads/main/dr_hayder_kawaz.svg";
 
-  const element = document.createElement('div');
-  element.innerHTML = content;
+  // Store the image in localStorage
+  fetch(imageUrl)
+    .then(response => response.blob())
+    .then(blob => {
+      const reader = new FileReader();
+      reader.onload = function () {
+        const storedImage = reader.result; // Base64 representation of the image
+        localStorage.setItem('footerImage', storedImage);
 
-  // Options for html2pdf
-  const options = {
-    margin: [20, 20, 20, 20], // Top, Left, Bottom, Right
-    filename: `Prescription_${patientName || 'Unknown'}_${new Date().toISOString().slice(0, 10)}.pdf`,
-    html2canvas: { scale: 4 }, // Higher scale for better quality
-    jsPDF: { unit: 'mm', format: 'a4' }, // A4 size with mm unit
-  };
+        const content = `
+          <div style="font-family: 'Times New Roman', Times, serif; width: 100%; text-align: center;">
+            <h2 style="color: darkblue; line-height: 0.5; font-size: 45px;">${doctorName || ''}</h2>
+            <p style="color: darkblue; line-height: 0.5; font-size: 20px;">${doctorSpecialty || ''}</p>
+            <p style="color: darkblue; line-height: 1.2; font-size: 15px;">${doctorWork || ''}</p>
+            <p style="color: darkblue; line-height: 0.5; font-size: 15px;">رقم التسجيل ${doctorRegNo || ''}</p>
+            <hr>
+            <div style="text-align: left;">
+              <p style="display: inline-block; width: 40%; padding-right: 10px;">Patient Name: ${patientName}</p>
+              <p style="display: inline-block; width: 27%; padding-right: 10px;">Age: ${patientAge}</p>
+              <p style="display: inline-block; width: 27%;">Sex: ${patientGender}</p>
+            </div>
+            <hr>
+            <p style="text-align: left; font-weight:bold;color:red">Prescription</p>
+            <ol style="color: black; padding-left: 20px; margin: 5px; line-height: 1.2;">
+              ${drugList}
+        
+            </ol>
+        <div style="padding-top: 20px;"></div>
+        
+            <div style="position: relative; text-align: right; margin-top: 20px;">
+              <p style="margin: 0; position: relative; z-index: 1;">Doctor's Signature</p>
+              <p id="dateDisplay" style="margin: 0; position: relative; z-index: 3; transform: translateX(-30px);">${formattedDate}</p>
+              <img src="${doctorSignatureSrc || ''}" alt="Doctor's Signature" style="position: absolute; top: -70px; right: 0; width: 150px; height: 100px; object-fit: contain; opacity: 0.8; z-index: 2;">
+            </div>
+        
+            <hr style="margin-bottom: -13px;">
+            <div style="display: flex; align-items: center; margin-top: 20px; justify-content: flex-start;">
+  <!-- Image Section -->
+  <div style="flex: 0 0 auto; margin-right: 10px;">
+    <img src="${storedImage}" alt="Footer Image" style="height: 60px; width: auto; max-height: 60px;">
+  </div>
 
-  html2pdf().set(options).from(element).save();
+  <!-- Text Section -->
+  <div style="flex: 1;">
+    <p style="text-align: right; line-height: 1.5; margin: 0; color: green;">العنوان ${doctorAddress || ''}</p>
+    <p style="display: flex; justify-content: space-between; align-items: center; line-height: 1.5; margin: 0; color: green;">
+      <span style="text-align: left;">Email: ${doctorEmail || ''}</span>
+      <span style="text-align: right;">الهاتف ${doctorMobile || ''}</span>
+    </p>
+  </div>
+</div>
+        `;
+
+        const element = document.createElement('div');
+        element.innerHTML = content;
+
+        // Options for html2pdf
+        const options = {
+          margin: [20, 20, 20, 20], // Top, Left, Bottom, Right
+          filename: `Prescription_${patientName || 'Unknown'}_${new Date().toISOString().slice(0, 10)}.pdf`,
+          html2canvas: { scale: 4 }, // Higher scale for better quality
+          jsPDF: { unit: 'mm', format: 'a4' }, // A4 size with mm unit
+        };
+
+        html2pdf().set(options).from(element).save();
+      };
+      reader.readAsDataURL(blob);
+    })
+    .catch(error => {
+      console.error('Error fetching image:', error);
+    });
 }
   </script>
 </body>

@@ -1,7 +1,7 @@
 {
   "name": "HK prescription",
   "short_name": "prescription",
-  "start_url": "/storage/emulated/0/Download/Prescription/index.html",
+  "start_url": "/Prescription-/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",

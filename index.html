@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Medical Prescription App</title>
+    <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      margin: 20px;
+      background-color: #f9f9f9;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .error {
+      color: red;
+      font-size: 0.9em;
+      margin-top: -10px;
+    }
+    .link {
+      display: block;
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+<div id="animation-container"></div>
+    <div class="container"style="display: none">
+    <h1>Welcome to the Medical Prescription App</h1>
+
+    <!-- Login Form -->
+    <div id="loginForm">
+      <h2>Login</h2>
+      <label for="loginUsername">Username</label>
+      <input type="text" id="loginUsername" placeholder="Enter your username" required>
+      <label for="loginPassword">Password</label>
+      <input type="password" id="loginPassword" placeholder="Enter your password" required>
+      <button type="button" onclick="loginUser()">Login</button>
+      <p class="error" id="loginError"></p>
+    </div>
+
+    <!-- Register Form (Hidden by default) -->
+    <div id="registerForm" style="display: none;">
+      <h2>Register</h2>
+      <label for="registerName">Name</label>
+      <input type="text" id="registerName" placeholder="Enter your name" required>
+      <label for="registerUsername">Username</label>
+      <input type="text" id="registerUsername" placeholder="Choose a username" required>
+      <label for="registerPassword">Password</label>
+      <input type="password" id="registerPassword" placeholder="Choose a password" required>
+      <label for="confirmPassword">Confirm Password</label>
+      <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+      <button type="button" onclick="registerUser()">Register</button>
+      <p class="error" id="registerError"></p>
+      <p class="link">Already have an account? <a href="javascript:void(0);" onclick="toggleForm('loginForm')">Login here</a></p>
+    </div>
+
+    <!-- Please Log in or Register message (Displayed below the login button) -->
+    <div class="link">
+      <p>Please log in or <a href="javascript:void(0);" onclick="toggleForm('registerForm')">Register</a> to access the app.</p>
+    </div>
+  </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.4/lottie.min.js"></script>
+  <script src="app.js"></script>
+  <script> if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then((registration) => {
+          console.log('Service Worker registered with scope:', registration.scope);
+        })
+        .catch((error) => {
+          console.error('Service Worker registration failed:', error);
+        });
+}
+  </script>
+  <script>
+    function toggleForm(formId) {
+      const forms = document.querySelectorAll('.container div');
+      forms.forEach(form => form.style.display = 'none');
+      document.getElementById(formId).style.display = 'block';
+      clearErrors();
+    }
+
+    function registerUser() {
+      const name = document.getElementById('registerName').value;
+      const username = document.getElementById('registerUsername').value;
+      const password = document.getElementById('registerPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (!name || !username || !password || !confirmPassword) {
+        showError('registerError', 'All fields are required!');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showError('registerError', 'Passwords do not match!');
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+      if (users.some(user => user.username === username)) {
+        showError('registerError', 'Username already exists!');
+        return;
+      }
+
+      users.push({ name, username, password });
+      localStorage.setItem('users', JSON.stringify(users));
+      alert('Registration successful!');
+      toggleForm('loginForm');
+    }
+
+    function loginUser() {
+      const username = document.getElementById('loginUsername').value;
+      const password = document.getElementById('loginPassword').value;
+
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+      const user = users.find(user => user.username === username && user.password === password);
+
+      if (!user) {
+        showError('loginError', 'Invalid username or password!');
+        return;
+      }
+
+      // Store user info in localStorage to display on the welcome page
+      localStorage.setItem('loggedInUser', JSON.stringify(user));
+      window.location.href = "welcome.html"; // Redirect to welcome page
+    }
+
+    function showError(errorElementId, errorMessage) {
+      const errorElement = document.getElementById(errorElementId);
+      errorElement.textContent = errorMessage;
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.error').forEach(error => error.textContent = '');
+    }
+  </script>
+</body>
+</html>

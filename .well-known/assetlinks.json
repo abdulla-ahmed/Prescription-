@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.abdulla_ahmed.Prescription",
+        "sha256_cert_fingerprints": ["5F:AB:CA:29:2A:A1:3F:61:DC:C4:40:7F:7A:09:E4:E6:BB:EB:7B:6C:CC:37:C9:93:0C:5C:C2:66:3E:8A:EA:C1"]
+      }
+    }]

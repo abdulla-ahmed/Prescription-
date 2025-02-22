@@ -67,6 +67,8 @@
       background-color: #f44336;
       color: white;
     }
+    
+    
   </style>
 </head>
 <body>
@@ -146,14 +148,14 @@
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>
-            <p><strong>Drug Name:</strong> ${drug.name || ''}</p>
+      <p><strong>Drug Name:</strong> ${drug.name || ''}</p>
             <p><strong>Dose:</strong> ${drug.dose || ''}</p>
             <p><strong>Duration:</strong> ${drug.duration || ''}</p>
             <p><strong>Amount:</strong> ${drug.amount || ''}</p>
             <p><strong>Frequency:</strong> ${drug.frequency || ''}</p>
             <p><strong>Meal:</strong> ${drug.meal || ''}</p>
             <p><strong>Notes:</strong> ${drug.notes || ''}</p>
-          </td>
+           </td>
         `;
         drugList.appendChild(row);
       });
@@ -184,9 +186,9 @@
     const { name, dose, duration, amount, frequency, meal, notes } = drug;
     return `
       <li style="margin-bottom: 5px; list-style-position: inside; text-align: left;">
-        <span><strong>Drug:</strong> ${name || ''}, <strong>Dose:</strong> ${dose || ''}, <strong>Duration:</strong> ${duration || ''}, <strong>Amount:</strong> ${amount || ''}</span>
+        <span><strong>${name || ''}</strong> <strong>&nbsp;</strong> ${dose || ''}<strong>&nbsp;&nbsp;${frequency || ''}</strong> <strong>&nbsp;&nbsp;</strong>${meal || ''}<strong>&nbsp;&nbsp;${duration || ''}</strong> <strong>&nbsp;&nbsp;&nbsp;---------&nbsp;&nbsp;</strong>${amount || ''}</span>
         <br>
-        <span><strong>Frequency:</strong> ${frequency || ''}, <strong>Meal:</strong> ${meal || ''}, <strong>Notes:</strong> ${notes || ''}</span>
+        <span><strong>&nbsp;&nbsp;&nbsp;&nbsp;</strong> ${notes || ''}</span>
       </li>
     `;
   }).join('');
@@ -225,7 +227,7 @@
             <div style="position: relative; text-align: right; margin-top: 20px;">
               <p style="margin: 0; position: relative; z-index: 1;">Doctor's Signature</p>
               <p id="dateDisplay" style="margin: 0; position: relative; z-index: 3; transform: translateX(-30px);">${formattedDate}</p>
-              <img src="${doctorSignatureSrc || ''}" alt="Doctor's Signature" style="position: absolute; top: -45px; right: 0; width: 110px; height: 70px; object-fit: contain; opacity: 0.8; z-index: 2;">
+              <img src="${doctorSignatureSrc || ''}" alt="Doctor's Signature" style="position: absolute; top: -70px; right: 0; width: 150px; height: 100px; object-fit: contain; opacity: 0.8; z-index: 2;">
             </div>
         
             <hr style="margin-bottom: -13px;">
@@ -234,7 +236,7 @@
   <div style="flex: 0 0 auto; margin-right: 10px;">
     <img src="${storedImage}" alt="Footer Image" style="height: 60px; width: auto; max-height: 60px;">
   </div>
-
+<footer class="footer">
   <!-- Text Section -->
   <div style="flex: 1;">
     <p style="text-align: right; line-height: 1.5; margin: 0; color: green;">العنوان ${doctorAddress || ''}</p>
@@ -243,6 +245,7 @@
       <span style="text-align: right;">الهاتف ${doctorMobile || ''}</span>
     </p>
   </div>
+  </footer>
 </div>
         `;
 

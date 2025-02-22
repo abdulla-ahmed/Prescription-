@@ -186,7 +186,7 @@
     const { name, dose, duration, amount, frequency, meal, notes } = drug;
     return `
       <li style="margin-bottom: 5px; list-style-position: inside; text-align: left;">
-        <span><strong>${name || ''}</strong> <strong>&nbsp;</strong> ${dose || ''}<strong>&nbsp;&nbsp;${frequency || ''}</strong> <strong>&nbsp;&nbsp;</strong>${meal || ''}<strong>&nbsp;&nbsp;${duration || ''}</strong> <strong>&nbsp;&nbsp;&nbsp;---------&nbsp;&nbsp;</strong>${amount || ''}</span>
+        <span><strong>${name || ''}</strong> <strong>&nbsp;</strong> ${dose || ''}<strong>&nbsp;&nbsp;${frequency || ''}</strong> <strong>&nbsp;&nbsp;</strong>${meal || ''}<strong>&nbsp;&nbsp;${duration || ''}</strong> <strong>&nbsp;&nbsp;-----&nbsp;&nbsp;</strong>${amount || ''}</span>
         <br>
         <span><strong>&nbsp;&nbsp;&nbsp;&nbsp;</strong> ${notes || ''}</span>
       </li>
